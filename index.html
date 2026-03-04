@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maharashtra Smart Rail - Route Planner</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body data-theme="dark">
+    <div class="app-container">
+        <!-- Top Navigation Bar -->
+        <header class="glass">
+            <div class="title-bar">
+                <div class="logo-dot"></div>
+                <h1>MAHA<span style="color: var(--accent)">RAIL</span>.IO</h1>
+            </div>
+
+            <div class="train-indicator">
+                <div class="indicator-dot"></div>
+                <span>Network Active: Mumbai-Pune Line</span>
+            </div>
+
+            <div class="nav-controls">
+                <select id="lang-selector" style="width: auto; margin-right: 10px;">
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="mr">Marathi</option>
+                </select>
+                <button id="theme-toggle" class="glass" style="padding: 6px 12px;">🌓</button>
+            </div>
+        </header>
+
+        <!-- Left Control Panel -->
+        <aside class="left-panel glass panel">
+            <h2>Route Planner</h2>
+
+            <div class="control-group">
+                <label>Source Station</label>
+                <input type="text" id="source" placeholder="E.g. CSMT, Mumbai" autocomplete="off">
+                <div id="source-autocomplete" class="autocomplete-list"></div>
+            </div>
+
+            <div class="control-group">
+                <label>Destination</label>
+                <input type="text" id="destination" placeholder="E.g. Pune City" autocomplete="off">
+            </div>
+
+            <div class="control-group">
+                <label>Preference</label>
+                <select id="route-pref">
+                    <option value="shortest">Shortest Path</option>
+                    <option value="fastest">Fastest (Express)</option>
+                    <option value="cheapest">Cheapest</option>
+                    <option value="comfort">Less Crowded</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Simulation Settings</label>
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Delay Simulation</span>
+                        <input type="checkbox" id="delay-toggle" style="width: 20px;">
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Blocked Routes</span>
+                        <input type="checkbox" id="blocked-toggle" style="width: 20px;">
+                    </div>
+                </div>
+            </div>
+
+            <button class="primary-btn" id="search-btn">Find Routes</button>
+        </aside>
+
+        <!-- Main Visualization Panel -->
+        <main class="main-visualization glass">
+            <div id="map-container" style="height: 100%; width: 100%;">
+                <!-- Neon SVG Map will be dynamically injected here -->
+            </div>
+
+            <div class="map-stats-overlay" style="position: absolute; top: 20px; left: 20px; display: flex; gap: 15px;">
+                <div class="glass" style="padding: 10px 15px; font-size: 0.8rem; border-left: 3px solid var(--accent);">
+                    <div style="color: var(--text-secondary)">SYSTEM LOAD</div>
+                    <div style="font-weight: 700;">OPTIONAL (82%)</div>
+                </div>
+                <div class="glass"
+                    style="padding: 10px 15px; font-size: 0.8rem; border-left: 3px solid var(--neon-purple);">
+                    <div style="color: var(--text-secondary)">ACTIVE NODES</div>
+                    <div style="font-weight: 700;">142 STATIONS</div>
+                </div>
+            </div>
+
+            <!-- Floating AI Assistant Button -->
+            <div id="ai-trigger" class="glass"
+                style="position: absolute; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--accent); font-size: 1.5rem; box-shadow: 0 4px 14px var(--accent-glow);">
+                🤖
+            </div>
+        </main>
+
+        <!-- Right Information Panel -->
+        <aside class="right-panel glass panel">
+            <h2 style="font-size: 1rem; color: var(--accent); letter-spacing: 2px;">LIVE ANALYTICS</h2>
+
+            <div class="glass" style="margin: 10px 0; padding: 15px; text-align: center;">
+                <div style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 5px;">CURRENT TRAVEL
+                    VELOCITY</div>
+                <div class="gauge-container">
+                    <div class="gauge-arc"></div>
+                    <div class="gauge-val">
+                        <span class="num">0</span>
+                        <div style="font-size: 0.6rem; color: var(--text-secondary);">KM/HR</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="route-details" style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="glass" style="padding: 15px; border-left: 3px solid var(--neon-purple);">
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">NETWORK HEALTH</div>
+                    <div style="font-size: 1.2rem; font-weight: 700;">98.4% NOMINAL</div>
+                </div>
+
+                <!-- NEW: Dynamic Density Widgets -->
+                <div class="glass" style="padding: 15px;">
+                    <label>Platform Prediction</label>
+                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                        <span class="glass" style="padding: 4px 8px; font-size: 0.8rem; color: var(--accent);">PF-4
+                            (90%)</span>
+                        <span class="glass"
+                            style="padding: 4px 8px; font-size: 0.8rem; color: var(--text-secondary);">PF-7 (10%)</span>
+                    </div>
+                </div>
+
+                <div class="glass" style="padding: 15px;">
+                    <label>Station Weather Sync</label>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+                        <span style="font-size: 1.5rem;">☀️</span>
+                        <div>
+                            <div style="font-weight: 700;">32°C Nagpur</div>
+                            <div style="font-size: 0.7rem; color: var(--text-secondary);">Humidity: 44% | Wind: 12km/h
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Bottom Section -->
+        <footer class="bottom-section glass panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3>LIVE SEAT TELEMETRY</h3>
+                <span style="color: var(--accent); font-size: 0.7rem; letter-spacing: 1px;">SYNCING WITH
+                    BACKEND...</span>
+            </div>
+            <div id="history-list" style="display: flex; gap: 15px; overflow-x: scroll; padding-bottom: 10px;">
+                <div class="glass" style="min-width: 180px; padding: 12px; border-top: 2px solid var(--accent);">
+                    <div style="font-size: 0.7rem; color: var(--text-secondary);">MUM → PUNE</div>
+                    <div style="font-weight: 700;">DECCAN QUEEN</div>
+                    <div style="font-size: 0.8rem; color: var(--neon-green);">Availability: 42 Seats</div>
+                </div>
+                <div class="glass" style="min-width: 180px; padding: 12px; border-top: 2px solid var(--neon-purple);">
+                    <div style="font-size: 0.7rem; color: var(--text-secondary);">NGP → BYC</div>
+                    <div style="font-weight: 700;">DURONTO EXP</div>
+                    <div style="font-size: 0.8rem; color: var(--warning);">Availability: 04 Seats</div>
+                </div>
+                <div class="glass" style="min-width: 180px; padding: 12px; border-top: 2px solid var(--danger);">
+                    <div style="font-size: 0.7rem; color: var(--text-secondary);">THN → KYN</div>
+                    <div style="font-weight: 700;">LOCAL (AC)</div>
+                    <div style="font-size: 0.8rem; color: var(--danger);">CRITICAL CROWD</div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- AI Assistant Panel (Hidden by default) -->
+    <div id="ai-panel" class="glass panel"
+        style="position: fixed; bottom: 85px; right: 32px; width: 300px; height: 400px; display: none; z-index: 1000;">
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-bottom: 10px;">
+            <h3>AI Assistant</h3>
+            <span id="close-ai" style="cursor: pointer;">✕</span>
+        </div>
+        <div id="ai-chat" style="flex: 1; overflow-y: auto; font-size: 0.9rem; line-height: 1.4;">
+            <p>Namaste! I am your MahaRail assistant. How can I help you today?</p>
+        </div>
+        <input type="text" placeholder="Ask about routes or delays..." style="margin-top: 10px;">
+    </div>
+
+    <script src="app.js"></script>
+    <script src="map-renderer.js"></script>
+    <script src="ai-assistant.js"></script>
+</body>
+
+</html>

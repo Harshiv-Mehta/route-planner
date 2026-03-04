@@ -1,0 +1,36 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Station {
+  id        String   @id
+  name      String
+  x         Float
+  y         Float
+  lines     String   // Comma separated lines for simplicity in SQLite
+  outgoing  Connection[] @relation("FromStation")
+  incoming  Connection[] @relation("ToStation")
+}
+
+model Connection {
+  id            Int      @id @default(autoincrement())
+  fromId        String
+  toId          String
+  fromStation   Station  @relation("FromStation", fields: [fromId], references: [id])
+  toStation     Station  @relation("ToStation", fields: [toId], references: [id])
+}
+
+model SearchHistory {
+  id          Int      @id @default(autoincrement())
+  source      String
+  destination String
+  timestamp   DateTime @default(now())
+}
