@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact | MetroPath</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/styles.css">
+</head>
+<body data-page="contact">
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="./index.html">
+        <span class="brand-mark">MP</span>
+        <span>MetroPath</span>
+      </a>
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle navigation">Menu</button>
+      <nav class="site-nav" id="siteNav">
+        <a href="./index.html" data-nav="home">Home</a>
+        <a href="./planner.html" data-nav="planner">Route Planner</a>
+        <a href="./network.html" data-nav="network">Network</a>
+        <a href="./manage.html" data-nav="manage">Manage</a>
+        <a href="./contact.html" data-nav="contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container section">
+    <h2>Contact</h2>
+    <p class="lead">Use this form as your support and enterprise inquiry entrypoint.</p>
+    <section class="panel panel-pad fade-up">
+      <form class="grid" id="contactForm">
+        <div class="input-wrap">
+          <label for="fullName">Name</label>
+          <input id="fullName" required>
+        </div>
+        <div class="input-wrap">
+          <label for="email">Email</label>
+          <input id="email" type="email" required>
+        </div>
+        <div class="input-wrap">
+          <label for="message">Message</label>
+          <textarea id="message" rows="5" required></textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">Send Message</button>
+        <div id="contactNotice"></div>
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">MetroPath frontend prototype. Copyright <span id="year"></span>.</div>
+  </footer>
+
+  <script src="./assets/js/app.js"></script>
+  <script>
+    (function () {
+      var form = document.getElementById("contactForm");
+      var notice = document.getElementById("contactNotice");
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        notice.className = "notice";
+        notice.textContent = "Message received. Wire this form to your backend mail service endpoint.";
+        form.reset();
+      });
+    })();
+  </script>
+</body>
+</html>

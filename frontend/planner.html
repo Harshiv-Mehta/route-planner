@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Route Planner | MetroPath</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/styles.css">
+</head>
+<body data-page="planner">
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="./index.html">
+        <span class="brand-mark">MP</span>
+        <span>MetroPath</span>
+      </a>
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle navigation">Menu</button>
+      <nav class="site-nav" id="siteNav">
+        <a href="./index.html" data-nav="home">Home</a>
+        <a href="./planner.html" data-nav="planner">Route Planner</a>
+        <a href="./network.html" data-nav="network">Network</a>
+        <a href="./manage.html" data-nav="manage">Manage</a>
+        <a href="./contact.html" data-nav="contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container section">
+    <h2>Route Query</h2>
+    <p class="lead">Choose a city first, then select source, destination, and ticket type. All three DB cities are now available in the planner.</p>
+    <div class="panel panel-pad fade-up">
+      <form class="grid form-grid" id="plannerForm">
+        <div class="input-wrap">
+          <label for="citySelect">City</label>
+          <select id="citySelect" required></select>
+        </div>
+        <div class="input-wrap action-wrap">
+          <label for="fromStation">From Station</label>
+          <select id="fromStation" required></select>
+        </div>
+        <div class="input-wrap">
+          <label for="toStation">To Station</label>
+          <select id="toStation" required></select>
+        </div>
+        <div class="input-wrap">
+          <label for="ticketType">Ticket Type</label>
+          <select id="ticketType">
+            <option value="token">Token</option>
+            <option value="one-pune-card">One Pune Card (10% off)</option>
+            <option value="vidyarthi-pass">Vidyarthi Pass (30% off)</option>
+          </select>
+        </div>
+        <div class="input-wrap">
+          <label for="tripType">Trip Type</label>
+          <select id="tripType">
+            <option value="single">Single</option>
+            <option value="return">Return</option>
+          </select>
+        </div>
+        <div class="input-wrap">
+          <button class="btn btn-primary" type="submit">Find Route</button>
+        </div>
+      </form>
+      <p class="lead planner-note" id="plannerSupportNote">Pune Metro support: <strong>18002705501</strong> | One Pune Card (10% off) and Vidyarthi Pass (30% off) supported.</p>
+      <p class="lead planner-note" id="plannerLinks">Useful links:
+        <a href="https://www.punemetrorail.org/" target="_blank" rel="noopener">Official Portal</a> |
+        <a href="https://www.punemetrorail.org/fare_chart.aspx" target="_blank" rel="noopener">Fare Chart</a> |
+        <a href="https://www.punemetrorail.org/" target="_blank" rel="noopener">Online Ticket</a> |
+        <a href="https://wa.me/919579168300" target="_blank" rel="noopener">WhatsApp Ticket</a>
+      </p>
+      <div class="result-box planner-result" id="routeResult">
+        Select stations and click <strong>Find Route</strong> to display the best path.
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">MetroPath frontend prototype. Copyright <span id="year"></span>.</div>
+  </footer>
+
+  <script src="./assets/js/metro-data.js"></script>
+  <script src="./assets/js/app.js"></script>
+  <script src="./assets/js/planner.js"></script>
+</body>
+</html>

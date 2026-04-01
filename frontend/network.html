@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Network Explorer | MetroPath</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/styles.css">
+</head>
+<body data-page="network">
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="./index.html">
+        <span class="brand-mark">MP</span>
+        <span>MetroPath</span>
+      </a>
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle navigation">Menu</button>
+      <nav class="site-nav" id="siteNav">
+        <a href="./index.html" data-nav="home">Home</a>
+        <a href="./planner.html" data-nav="planner">Route Planner</a>
+        <a href="./network.html" data-nav="network">Network</a>
+        <a href="./manage.html" data-nav="manage">Manage</a>
+        <a href="./contact.html" data-nav="contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container section">
+    <h2>Network Visualization</h2>
+    <p class="lead">Live view of stations and metro links currently loaded in the frontend store.</p>
+    <div class="panel panel-pad fade-up">
+      <div id="networkSummary"></div>
+      <div id="lineTags"></div>
+    </div>
+    <div class="panel table-wrap panel-pad fade-up">
+      <table>
+        <thead>
+          <tr>
+            <th>Line</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Distance (km)</th>
+            <th>Base Fare (Rs)</th>
+            <th>Stops</th>
+          </tr>
+        </thead>
+        <tbody id="networkRows"></tbody>
+      </table>
+    </div>
+    <div class="panel panel-pad fade-up">
+      <h3>Database Station Directory</h3>
+      <p class="lead">All city and station names below are aligned with the database seed data.</p>
+      <div id="cityCatalog"></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">MetroPath frontend prototype. Copyright <span id="year"></span>.</div>
+  </footer>
+
+  <script src="./assets/js/metro-data.js"></script>
+  <script src="./assets/js/app.js"></script>
+  <script src="./assets/js/network.js"></script>
+</body>
+</html>

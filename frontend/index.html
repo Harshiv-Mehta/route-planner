@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MetroPath | Smart Metro Route Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/styles.css">
+</head>
+<body data-page="home">
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="./index.html">
+        <span class="brand-mark">MP</span>
+        <span>MetroPath</span>
+      </a>
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle navigation">Menu</button>
+      <nav class="site-nav" id="siteNav">
+        <a href="./index.html" data-nav="home">Home</a>
+        <a href="./planner.html" data-nav="planner">Route Planner</a>
+        <a href="./network.html" data-nav="network">Network</a>
+        <a href="./manage.html" data-nav="manage">Manage</a>
+        <a href="./contact.html" data-nav="contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero fade-up">
+      <div class="fade-up">
+        <p class="kicker">Urban Transit Intelligence</p>
+        <h1>Plan the fastest, cheapest, and cleanest route in seconds.</h1>
+        <p class="lead">MetroPath brings practical trip planning, network visibility, and station management into one modern web interface based on your existing metro-planner logic.</p>
+        <div class="cta-row">
+          <a href="./planner.html" class="btn btn-primary">Start Route Query</a>
+          <a href="./network.html" class="btn btn-outline">View Network</a>
+        </div>
+      </div>
+      <aside class="panel hero-panel fade-up">
+        <div class="grid metrics">
+          <div class="metric-card">
+            <strong>3 Cities</strong>
+            <span>Mumbai, Pune, Nagpur</span>
+          </div>
+          <div class="metric-card">
+            <strong>75</strong>
+            <span>Stations In Database Seed</span>
+          </div>
+          <div class="metric-card">
+            <strong>1 Tap</strong>
+            <span>Pune Fare Lookup</span>
+          </div>
+        </div>
+        <p class="lead">Frontend now mirrors the database naming set across Mumbai, Pune, and Nagpur, while keeping live official fare lookup for Pune trips.</p>
+      </aside>
+    </section>
+
+    <section class="section fade-up">
+      <h2>Everything Needed for the Full Website</h2>
+      <p class="lead">Each module reflects your Java application features and can be connected to your backend APIs when ready.</p>
+      <div class="grid card-grid">
+        <article class="card">
+          <div class="icon">R</div>
+          <h3>Route Planning</h3>
+          <p class="lead">Uses DB-aligned Pune station names and shows official Pune Metro fare for the selected trip.</p>
+        </article>
+        <article class="card">
+          <div class="icon">N</div>
+          <h3>Network Explorer</h3>
+          <p class="lead">Includes a full city and station directory so every DB city and station name is visible in the frontend.</p>
+        </article>
+        <article class="card">
+          <div class="icon">M</div>
+          <h3>Admin Management</h3>
+          <p class="lead">Add stations and routes from web forms to test expanding networks without touching code.</p>
+        </article>
+        <article class="card">
+          <div class="icon">S</div>
+          <h3>Mobile Ready</h3>
+          <p class="lead">Responsive layout and collapsible nav so users can route-plan from desktop and phone.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">MetroPath frontend prototype. Copyright <span id="year"></span>.</div>
+  </footer>
+
+  <script src="./assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Network Management | MetroPath</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/styles.css">
+</head>
+<body data-page="manage">
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="./index.html">
+        <span class="brand-mark">MP</span>
+        <span>MetroPath</span>
+      </a>
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle navigation">Menu</button>
+      <nav class="site-nav" id="siteNav">
+        <a href="./index.html" data-nav="home">Home</a>
+        <a href="./planner.html" data-nav="planner">Route Planner</a>
+        <a href="./network.html" data-nav="network">Network</a>
+        <a href="./manage.html" data-nav="manage">Manage</a>
+        <a href="./contact.html" data-nav="contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container section">
+    <h2>Network Management</h2>
+    <p class="lead">Add stations and routes dynamically. Data is stored in browser local storage.</p>
+
+    <div class="grid form-grid">
+      <section class="panel panel-pad fade-up">
+        <h3>Add Station</h3>
+        <form id="stationForm" class="grid">
+          <div class="input-wrap">
+            <label for="stationName">Station Name</label>
+            <input id="stationName" required placeholder="e.g. City Center">
+          </div>
+          <button type="submit" class="btn btn-primary">Add Station</button>
+          <div id="stationNotice"></div>
+        </form>
+      </section>
+
+      <section class="panel panel-pad fade-up">
+        <h3>Add Route</h3>
+        <form id="routeForm" class="grid">
+          <div class="input-wrap">
+            <label for="routeFrom">From</label>
+            <select id="routeFrom" required></select>
+          </div>
+          <div class="input-wrap">
+            <label for="routeTo">To</label>
+            <select id="routeTo" required></select>
+          </div>
+          <div class="input-wrap">
+            <label for="routeDistance">Distance (km)</label>
+            <input id="routeDistance" type="number" min="1" required>
+          </div>
+          <div class="input-wrap">
+            <label for="routeStops">Stops</label>
+            <input id="routeStops" type="number" min="1" required>
+          </div>
+          <div class="input-wrap">
+            <label for="routeLine">Line Name</label>
+            <input id="routeLine" required placeholder="e.g. Silver">
+          </div>
+          <button type="submit" class="btn btn-primary">Add Route</button>
+          <div id="routeNotice"></div>
+        </form>
+      </section>
+    </div>
+
+    <section class="panel panel-pad fade-up">
+      <button id="resetBtn" class="btn btn-outline" type="button">Reset to Sample Network</button>
+      <div id="resetNotice"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">MetroPath frontend prototype. Copyright <span id="year"></span>.</div>
+  </footer>
+
+  <script src="./assets/js/metro-data.js"></script>
+  <script src="./assets/js/app.js"></script>
+  <script src="./assets/js/manage.js"></script>
+</body>
+</html>
