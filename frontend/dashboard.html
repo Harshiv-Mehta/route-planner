@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MetroPath Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/styles.css">
+</head>
+<body data-page="home">
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="./dashboard.html">
+        <span class="brand-mark">MP</span>
+        <span>MetroPath</span>
+      </a>
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle navigation">Menu</button>
+      <nav class="site-nav" id="siteNav">
+        <a href="./dashboard.html" data-nav="home">Dashboard</a>
+        <a href="./planner.html" data-nav="planner">Planner</a>
+        <a href="./network.html" data-nav="network">Network</a>
+        <a href="./manage.html" data-nav="manage">Manage</a>
+        <a href="./contact.html" data-nav="contact">Contact</a>
+      </nav>
+      <button class="logout-btn" id="logoutBtn" type="button">Logout</button>
+    </div>
+  </header>
+
+  <main class="container section">
+    <section class="hero-shell fade-up">
+      <section class="panel panel-pad glass">
+        <p class="kicker">Operations Dashboard</p>
+        <h1>Move across Maharashtra with one clean route workspace.</h1>
+        <p class="lead">Switch cities, inspect lines, and jump straight into route planning without the generic filler sections. This dashboard is focused on action.</p>
+        <div class="cta-row" style="margin-top:1rem;">
+          <a href="./planner.html" class="btn btn-primary">Open Planner</a>
+          <a href="./network.html" class="btn btn-outline">Inspect Network</a>
+        </div>
+      </section>
+
+      <section class="grid metrics">
+        <div class="stat-card">
+          <strong>3</strong>
+          <span class="lead">Active City Networks</span>
+        </div>
+        <div class="stat-card">
+          <strong>75</strong>
+          <span class="lead">Stations In Seed Data</span>
+        </div>
+        <div class="stat-card">
+          <strong>Live</strong>
+          <span class="lead">Pune Official Fare Lookup</span>
+        </div>
+      </section>
+    </section>
+
+    <section class="dashboard-grid fade-up">
+      <section class="panel panel-pad">
+        <p class="kicker">Quick Actions</p>
+        <div class="card-grid">
+          <article class="card">
+            <div class="icon">P</div>
+            <h3>Plan A Route</h3>
+            <p class="lead">Choose city, source, destination, and trip type in one focused flow.</p>
+          </article>
+          <article class="card">
+            <div class="icon">N</div>
+            <h3>View Station Directory</h3>
+            <p class="lead">See every database city and station name surfaced in the frontend.</p>
+          </article>
+          <article class="card">
+            <div class="icon">M</div>
+            <h3>Extend Test Data</h3>
+            <p class="lead">Add stations and connections through the management screen when needed.</p>
+          </article>
+        </div>
+      </section>
+
+      <aside class="panel panel-pad glass">
+        <p class="kicker">Travel Notes</p>
+        <h3>What changed</h3>
+        <p class="lead">Authentication now gates entry, the app supports both light and dark themes, and the footer rotates safe-route reminders so the experience feels alive instead of static.</p>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">MetroPath workspace. Copyright <span id="year"></span>.</div>
+  </footer>
+
+  <script src="./assets/js/app.js"></script>
+</body>
+</html>
