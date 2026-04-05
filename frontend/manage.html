@@ -30,15 +30,33 @@
 
   <main class="container section">
     <h2>Network Management</h2>
-    <p class="lead">Add stations and routes dynamically. Data is stored in browser local storage.</p>
+    <p class="lead">Add stations and routes directly into the backend database used by the planner.</p>
 
     <div class="grid form-grid">
       <section class="panel panel-pad fade-up">
         <h3>Add Station</h3>
         <form id="stationForm" class="grid">
           <div class="input-wrap">
+            <label for="stationCity">City</label>
+            <select id="stationCity" required></select>
+          </div>
+          <div class="input-wrap">
             <label for="stationName">Station Name</label>
             <input id="stationName" required placeholder="e.g. City Center">
+          </div>
+          <div class="input-wrap">
+            <label for="stationLines">Lines</label>
+            <input id="stationLines" required placeholder="e.g. Purple,Central">
+          </div>
+          <div class="grid form-grid">
+            <div class="input-wrap">
+              <label for="stationX">Map X</label>
+              <input id="stationX" type="number" min="0" required placeholder="e.g. 440">
+            </div>
+            <div class="input-wrap">
+              <label for="stationY">Map Y</label>
+              <input id="stationY" type="number" min="0" required placeholder="e.g. 780">
+            </div>
           </div>
           <button type="submit" class="btn btn-primary">Add Station</button>
           <div id="stationNotice"></div>
@@ -48,6 +66,10 @@
       <section class="panel panel-pad fade-up">
         <h3>Add Route</h3>
         <form id="routeForm" class="grid">
+          <div class="input-wrap">
+            <label for="routeCity">City</label>
+            <select id="routeCity" required></select>
+          </div>
           <div class="input-wrap">
             <label for="routeFrom">From</label>
             <select id="routeFrom" required></select>
@@ -65,8 +87,8 @@
             <input id="routeStops" type="number" min="1" required>
           </div>
           <div class="input-wrap">
-            <label for="routeLine">Line Name</label>
-            <input id="routeLine" required placeholder="e.g. Silver">
+            <label for="routeCost">Fare / Cost</label>
+            <input id="routeCost" type="number" min="0" required placeholder="e.g. 20">
           </div>
           <button type="submit" class="btn btn-primary">Add Route</button>
           <div id="routeNotice"></div>
@@ -75,7 +97,7 @@
     </div>
 
     <section class="panel panel-pad fade-up">
-      <button id="resetBtn" class="btn btn-outline" type="button">Reset to Sample Network</button>
+      <button id="resetBtn" class="btn btn-outline" type="button">Reset Database to Seed Data</button>
       <div id="resetNotice"></div>
     </section>
   </main>

@@ -1,0 +1,21 @@
+{
+  "name": "route-planner",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "dev": "node local-server.js",
+    "start": "node local-server.js",
+    "prisma:generate": "prisma generate --schema Database/schema.prisma",
+    "db:push": "prisma db push --schema Database/schema.prisma",
+    "db:bootstrap": "node scripts/bootstrap-db.js",
+    "render:start": "npm run db:push && npm run db:bootstrap && npm run start",
+    "postinstall": "npm run prisma:generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.6.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.6.0"
+  }
+}

@@ -9,29 +9,18 @@
   var supportNode = document.getElementById("plannerSupportNote");
   var linksNode = document.getElementById("plannerLinks");
 
-  if (!cityNode || !fromNode || !toNode || !form || !window.MetroData || !window.MetroCatalog) {
+  if (!cityNode || !fromNode || !toNode || !form || !window.MetroApi) {
     return;
   }
 
-  var network = MetroData.load();
+  var appState = {
+    catalog: null,
+    cityNetwork: null
+  };
 
-  function getRouteStationsForCity(cityId) {
-    var cityStations = window.MetroCatalog.stations
-      .filter(function (station) {
-        return station.cityId === cityId;
-      })
-      .map(function (station) {
-        return station.name;
-      });
-
-    return cityStations.filter(function (station) {
-      return network.stations.indexOf(station) > -1;
-    });
-  }
-
-  function populateCities() {
+  function populateCities(cities) {
     cityNode.innerHTML = "";
-    window.MetroCatalog.cities.forEach(function (city) {
+    cities.forEach(function (city) {
       var option = document.createElement("option");
       option.value = city.id;
       option.textContent = city.name;
@@ -45,13 +34,13 @@
 
     stations.forEach(function (station) {
       var optionFrom = document.createElement("option");
-      optionFrom.value = station;
-      optionFrom.textContent = station;
+      optionFrom.value = station.name;
+      optionFrom.textContent = station.name;
       fromNode.appendChild(optionFrom);
 
       var optionTo = document.createElement("option");
-      optionTo.value = station;
-      optionTo.textContent = station;
+      optionTo.value = station.name;
+      optionTo.textContent = station.name;
       toNode.appendChild(optionTo);
     });
 
@@ -65,47 +54,42 @@
     supportNode.style.display = isPune ? "block" : "none";
     linksNode.style.display = isPune ? "block" : "none";
 
-    var passSupported = isPune;
     Array.prototype.forEach.call(ticketTypeNode.options, function (option) {
       if (option.value === "one-pune-card" || option.value === "vidyarthi-pass") {
-        option.disabled = !passSupported;
+        option.disabled = !isPune;
       }
     });
-    if (!passSupported && ticketTypeNode.value !== "token") {
+    if (!isPune && ticketTypeNode.value !== "token") {
       ticketTypeNode.value = "token";
     }
   }
 
   function buildAdjacency(stations, routes) {
     var graph = {};
-    stations.forEach(function (name) {
-      graph[name] = [];
+    stations.forEach(function (station) {
+      graph[station.name] = [];
     });
 
     routes.forEach(function (route) {
-      graph[route.from].push(route);
-      graph[route.to].push({
-        from: route.to,
-        to: route.from,
-        distance: route.distance,
-        cost: route.cost,
-        stops: route.stops,
-        line: route.line
-      });
+      if (graph[route.from] && graph[route.to]) {
+        graph[route.from].push(route);
+      }
     });
 
     return graph;
   }
 
-  function findBestCommute(networkData, from, to) {
-    var stations = networkData.stations;
-    var graph = buildAdjacency(stations, networkData.routes);
+  function findBestCommute(network, from, to) {
+    var graph = buildAdjacency(network.stations, network.routes);
+    var stationNames = network.stations.map(function (station) {
+      return station.name;
+    });
     var dist = {};
     var prev = {};
     var lineAt = {};
     var visited = {};
 
-    stations.forEach(function (name) {
+    stationNames.forEach(function (name) {
       dist[name] = Number.POSITIVE_INFINITY;
       prev[name] = null;
       lineAt[name] = null;
@@ -117,7 +101,7 @@
       var node = null;
       var best = Number.POSITIVE_INFINITY;
 
-      stations.forEach(function (name) {
+      stationNames.forEach(function (name) {
         if (!visited[name] && dist[name] < best) {
           best = dist[name];
           node = name;
@@ -189,40 +173,19 @@
     return {
       baseSingle: baseFare,
       discountRate: discountRate,
-      singleFare: singleFare,
       totalFare: totalFare
     };
   }
 
-  async function fetchOfficialFare(cityId, from, to) {
-    if (cityId !== "pune") {
-      return null;
-    }
-
-    try {
-      var response = await fetch(
-        "/api/pune-fare?from=" + encodeURIComponent(from) + "&to=" + encodeURIComponent(to)
-      );
-      if (!response.ok) return null;
-      var payload = await response.json();
-      return payload && typeof payload.fare === "number" ? payload.fare : null;
-    } catch (error) {
-      return null;
-    }
-  }
-
   function renderResult(cityId, result, ticketType, tripType, officialBaseFare) {
     if (!result) {
-      resultNode.innerHTML = "<strong>No route found.</strong> Try another station pair in the selected city.";
+      resultNode.innerHTML = "<strong>No route found.</strong> This station pair is disconnected in the backend data.";
       return;
     }
 
-    var fareBreakdown;
-    if (typeof officialBaseFare === "number") {
-      fareBreakdown = calculateFare(officialBaseFare, ticketType, tripType);
-    } else {
-      fareBreakdown = calculateFare(result.totals.cost, "token", tripType);
-    }
+    var fareBreakdown = typeof officialBaseFare === "number"
+      ? calculateFare(officialBaseFare, ticketType, tripType)
+      : calculateFare(result.totals.cost, "token", tripType);
 
     var discountLabel = fareBreakdown.discountRate > 0
       ? Math.round(fareBreakdown.discountRate * 100) + "% discount applied"
@@ -234,7 +197,7 @@
     var tripLabel = tripType === "return" ? "Return" : "Single";
     var fareSource = cityId === "pune" && typeof officialBaseFare === "number"
       ? "Official Pune Metro fare chart"
-      : "Database seed fare";
+      : "Database connection cost";
 
     resultNode.innerHTML =
       "<p><strong>Best Commute Route</strong></p>" +
@@ -252,31 +215,33 @@
       "<p class='lead'>Fare source: " + fareSource + "</p>";
   }
 
-  function getCityNetwork(cityId) {
-    var stations = getRouteStationsForCity(cityId);
-    var routes = network.routes.filter(function (route) {
-      return stations.indexOf(route.from) > -1 && stations.indexOf(route.to) > -1;
-    });
-    return { stations: stations, routes: routes };
-  }
-
-  function refreshCityStations() {
-    var cityId = cityNode.value;
-    var stations = getRouteStationsForCity(cityId);
-    populateStations(stations);
+  async function loadCityNetwork(cityId) {
+    resultNode.innerHTML = "Loading network from database...";
+    appState.cityNetwork = await window.MetroApi.getNetwork(cityId);
+    populateStations(appState.cityNetwork.stations);
     updatePlannerMeta(cityId);
+    resultNode.innerHTML = "Choose stations in the selected city and click <strong>Find Route</strong>.";
   }
 
-  populateCities();
-  refreshCityStations();
+  async function init() {
+    appState.catalog = await window.MetroApi.getNetwork();
+    populateCities(appState.catalog.cities);
+    await loadCityNetwork(cityNode.value);
+  }
 
   cityNode.addEventListener("change", function () {
-    refreshCityStations();
-    resultNode.innerHTML = "Choose stations in the selected city and click <strong>Find Route</strong>.";
+    loadCityNetwork(cityNode.value).catch(function (error) {
+      resultNode.innerHTML = "<strong>Unable to load city network.</strong> " + error.message;
+    });
   });
 
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
+
+    if (!appState.cityNetwork) {
+      resultNode.innerHTML = "<strong>Network is still loading.</strong>";
+      return;
+    }
 
     if (fromNode.value === toNode.value) {
       resultNode.innerHTML = "<strong>Source and destination cannot be the same.</strong>";
@@ -284,13 +249,25 @@
     }
 
     var cityId = cityNode.value;
-    var cityNetwork = getCityNetwork(cityId);
     resultNode.innerHTML = cityId === "pune"
-      ? "Fetching official Pune Metro fare and route..."
-      : "Finding route using database connections...";
+      ? "Fetching official Pune Metro fare and backend route..."
+      : "Finding route using backend connections...";
 
-    var result = findBestCommute(cityNetwork, fromNode.value, toNode.value);
-    var officialBaseFare = await fetchOfficialFare(cityId, fromNode.value, toNode.value);
+    var result = findBestCommute(appState.cityNetwork, fromNode.value, toNode.value);
+    var officialBaseFare = null;
+    if (cityId === "pune") {
+      var farePayload = await window.MetroApi.getPuneFare(fromNode.value, toNode.value);
+      officialBaseFare = farePayload && typeof farePayload.fare === "number" ? farePayload.fare : null;
+    }
     renderResult(cityId, result, ticketTypeNode.value, tripTypeNode.value, officialBaseFare);
+
+    window.MetroApi.saveSearchHistory({
+      source: fromNode.value,
+      destination: toNode.value
+    }).catch(function () {});
+  });
+
+  init().catch(function (error) {
+    resultNode.innerHTML = "<strong>Unable to load route planner.</strong> " + error.message;
   });
 })();

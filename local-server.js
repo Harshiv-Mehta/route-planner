@@ -3,8 +3,19 @@ const https = require("https");
 const fs = require("fs");
 const path = require("path");
 const { URL, URLSearchParams } = require("url");
+const { execFile } = require("child_process");
 
+if (!process.env.DATABASE_URL) {
+  const localDbPath = path.resolve(__dirname, "Database", "dev.db").replace(/\\/g, "/");
+  process.env.DATABASE_URL = `file:${localDbPath}`;
+}
+
+const { PrismaClient } = require("@prisma/client");
+
+const prisma = new PrismaClient();
+const PORT = Number(process.env.PORT) || 5500;
 const base = path.resolve(__dirname, "frontend");
+const seedPath = path.resolve(__dirname, "Database", "seed.js");
 const mime = {
   ".html": "text/html",
   ".css": "text/css",
@@ -93,7 +104,6 @@ async function getFareContext() {
   const first = await httpGet(PUNE_FARE_URL);
   const html = first.data;
   const cookies = (first.headers["set-cookie"] || []).map((s) => s.split(";")[0]).join("; ");
-
   const viewState = parseHiddenField(html, "__VIEWSTATE");
   const eventValidation = parseHiddenField(html, "__EVENTVALIDATION");
   const viewStateGenerator = parseHiddenField(html, "__VIEWSTATEGENERATOR");
@@ -119,7 +129,7 @@ async function getFareContext() {
 }
 
 function parseFare(html) {
-  const m = html.match(/class="color_light_purple">₹&nbsp\s*(\d+)/);
+  const m = html.match(/class="color_light_purple">(?:₹|â‚¹)&nbsp\s*(\d+)/);
   return m ? Number(m[1]) : null;
 }
 
@@ -155,10 +165,112 @@ function sendJson(res, status, payload) {
   res.end(JSON.stringify(payload));
 }
 
+function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    let data = "";
+    req.on("data", (chunk) => {
+      data += chunk;
+    });
+    req.on("end", () => {
+      try {
+        resolve(data ? JSON.parse(data) : {});
+      } catch (error) {
+        reject(error);
+      }
+    });
+    req.on("error", reject);
+  });
+}
+
+function deriveLine(fromLines, toLines) {
+  const fromSet = String(fromLines || "")
+    .split(",")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const toSet = String(toLines || "")
+    .split(",")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const shared = fromSet.find((line) => toSet.indexOf(line) > -1);
+  return shared || "Connector";
+}
+
+function slugify(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+async function buildNetwork(cityId) {
+  const cityWhere = cityId ? { cityId: cityId } : {};
+  const cities = await prisma.city.findMany({ orderBy: { name: "asc" } });
+  const stations = await prisma.station.findMany({
+    where: cityWhere,
+    orderBy: { name: "asc" }
+  });
+
+  const stationById = {};
+  stations.forEach((station) => {
+    stationById[station.id] = station;
+  });
+
+  const connections = await prisma.connection.findMany({
+    where: cityId
+      ? {
+          fromStation: { cityId: cityId },
+          toStation: { cityId: cityId }
+        }
+      : undefined,
+    include: {
+      fromStation: true,
+      toStation: true
+    },
+    orderBy: { id: "asc" }
+  });
+
+  const routes = connections.map((connection) => ({
+    id: connection.id,
+    fromId: connection.fromId,
+    toId: connection.toId,
+    from: connection.fromStation.name,
+    to: connection.toStation.name,
+    cityId: connection.fromStation.cityId,
+    line: deriveLine(connection.fromStation.lines, connection.toStation.lines),
+    distance: connection.distance,
+    cost: connection.cost,
+    stops: connection.stops
+  }));
+
+  return { cities, stations, routes };
+}
+
+async function resetDatabase() {
+  return new Promise((resolve, reject) => {
+    execFile(process.execPath, [seedPath], { cwd: __dirname }, (error, stdout, stderr) => {
+      if (error) {
+        reject(new Error(stderr || error.message));
+        return;
+      }
+      stationCache = null;
+      fareCache.clear();
+      resolve(stdout);
+    });
+  });
+}
+
 const server = http.createServer(async (req, res) => {
   try {
-    const reqUrl = new URL(req.url, "http://127.0.0.1:5500");
-    if (reqUrl.pathname === "/api/pune-fare") {
+    const reqUrl = new URL(req.url, `http://127.0.0.1:${PORT}`);
+
+    if (req.method === "GET" && reqUrl.pathname === "/api/network") {
+      const cityId = reqUrl.searchParams.get("cityId") || undefined;
+      const network = await buildNetwork(cityId);
+      sendJson(res, 200, network);
+      return;
+    }
+
+    if (req.method === "GET" && reqUrl.pathname === "/api/pune-fare") {
       const from = reqUrl.searchParams.get("from");
       const to = reqUrl.searchParams.get("to");
       if (!from || !to) {
@@ -167,6 +279,95 @@ const server = http.createServer(async (req, res) => {
       }
       const fare = await getOfficialPuneFare(from, to);
       sendJson(res, 200, fare);
+      return;
+    }
+
+    if (req.method === "POST" && reqUrl.pathname === "/api/stations") {
+      const body = await readJsonBody(req);
+      if (!body.name || !body.cityId) {
+        sendJson(res, 400, { error: "Missing station name or cityId" });
+        return;
+      }
+
+      const baseId = slugify(body.cityId + "_" + body.name);
+      let stationId = baseId;
+      let suffix = 1;
+      while (await prisma.station.findUnique({ where: { id: stationId } })) {
+        suffix += 1;
+        stationId = `${baseId}_${suffix}`;
+      }
+
+      const created = await prisma.station.create({
+        data: {
+          id: stationId,
+          name: body.name,
+          cityId: body.cityId,
+          lines: body.lines || "Connector",
+          x: Number(body.x) || 0,
+          y: Number(body.y) || 0
+        }
+      });
+      sendJson(res, 201, created);
+      return;
+    }
+
+    if (req.method === "POST" && reqUrl.pathname === "/api/connections") {
+      const body = await readJsonBody(req);
+      const fromStation = body.fromId
+        ? await prisma.station.findUnique({ where: { id: body.fromId } })
+        : await prisma.station.findFirst({
+            where: {
+              name: body.from,
+              ...(body.cityId ? { cityId: body.cityId } : {})
+            }
+          });
+      const toStation = body.toId
+        ? await prisma.station.findUnique({ where: { id: body.toId } })
+        : await prisma.station.findFirst({
+            where: {
+              name: body.to,
+              ...(body.cityId ? { cityId: body.cityId } : {})
+            }
+          });
+      if (!fromStation || !toStation) {
+        sendJson(res, 404, { error: "Station not found" });
+        return;
+      }
+
+      const cost = Number(body.cost) || 0;
+      const distance = Number(body.distance) || 0;
+      const stops = Number(body.stops) || 1;
+
+      await prisma.connection.create({
+        data: { fromId: fromStation.id, toId: toStation.id, distance, cost, stops }
+      });
+      await prisma.connection.create({
+        data: { fromId: toStation.id, toId: fromStation.id, distance, cost, stops }
+      });
+
+      sendJson(res, 201, { ok: true });
+      return;
+    }
+
+    if (req.method === "POST" && reqUrl.pathname === "/api/search-history") {
+      const body = await readJsonBody(req);
+      if (!body.source || !body.destination) {
+        sendJson(res, 400, { error: "Missing source/destination" });
+        return;
+      }
+      const created = await prisma.searchHistory.create({
+        data: {
+          source: body.source,
+          destination: body.destination
+        }
+      });
+      sendJson(res, 201, created);
+      return;
+    }
+
+    if (req.method === "POST" && reqUrl.pathname === "/api/reset-demo") {
+      await resetDatabase();
+      sendJson(res, 200, { ok: true });
       return;
     }
 
@@ -189,8 +390,13 @@ const server = http.createServer(async (req, res) => {
       res.end(data);
     });
   } catch (error) {
-    sendJson(res, 500, { error: "server_error", detail: String(error && error.message ? error.message : error) });
+    sendJson(res, 500, {
+      error: "server_error",
+      detail: String(error && error.message ? error.message : error)
+    });
   }
 });
 
-server.listen(5500, "127.0.0.1");
+server.listen(PORT, "127.0.0.1", () => {
+  console.log(`MetroPath server running on http://127.0.0.1:${PORT}`);
+});

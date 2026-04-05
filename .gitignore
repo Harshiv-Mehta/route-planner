@@ -1,0 +1,3 @@
+node_modules/
+Database/*.db
+Database/*.db-journal

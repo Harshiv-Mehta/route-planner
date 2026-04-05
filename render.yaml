@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: route-planner
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm run render:start
+    envVars:
+      - key: DATABASE_URL
+        value: file:/var/data/route-planner.db
+      - key: NODE_VERSION
+        value: 20
+    disk:
+      name: route-planner-data
+      mountPath: /var/data
+      sizeGB: 1

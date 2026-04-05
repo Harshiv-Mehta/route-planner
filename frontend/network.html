@@ -30,8 +30,12 @@
 
   <main class="container section">
     <h2>Network Directory</h2>
-    <p class="lead">Browse route links, active lines, and the database-aligned city station catalog.</p>
+    <p class="lead">Browse route links, active lines, and the database-backed city station catalog.</p>
     <div class="panel panel-pad fade-up">
+      <div class="input-wrap">
+        <label for="networkCity">City Filter</label>
+        <select id="networkCity"></select>
+      </div>
       <div id="networkSummary"></div>
       <div id="lineTags"></div>
     </div>
@@ -39,6 +43,7 @@
       <table>
         <thead>
           <tr>
+            <th>City</th>
             <th>Line</th>
             <th>From</th>
             <th>To</th>

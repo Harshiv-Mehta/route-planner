@@ -1,4 +1,11 @@
+const path = require('path');
 const { PrismaClient } = require('@prisma/client');
+
+if (!process.env.DATABASE_URL) {
+    const localDbPath = path.resolve(__dirname, 'dev.db').replace(/\\/g, '/');
+    process.env.DATABASE_URL = `file:${localDbPath}`;
+}
+
 const prisma = new PrismaClient();
 
 async function main() {
