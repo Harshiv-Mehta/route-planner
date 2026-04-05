@@ -7,10 +7,6 @@ services:
     startCommand: npm run render:start
     envVars:
       - key: DATABASE_URL
-        value: file:/var/data/route-planner.db
+        value: file:./dev.db
       - key: NODE_VERSION
         value: 20
-    disk:
-      name: route-planner-data
-      mountPath: /var/data
-      sizeGB: 1
